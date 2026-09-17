@@ -1,4 +1,5 @@
 """Charge les données transformées dans une base mongo."""
+
 import os
 
 from dotenv import load_dotenv
@@ -37,7 +38,4 @@ def load_to_mongo(db, collection_name, data):
 
     result = collection.insert_many(data)
 
-    print(
-        f"{collection_name}: "
-        f"{len(result.inserted_ids)} documents insérés"
-    )
+    print(f"{collection_name}: {len(result.inserted_ids)} documents insérés")

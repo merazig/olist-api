@@ -2,85 +2,77 @@
 
 import pandas as pd
 
-import time
-
 
 def orders_dict():
-    """Cree le dict des ordres."""
-    orders_mongo = []
-
+    """Crée les documents MongoDB des commandes."""
     orders = pd.read_csv("data/proceed/orders_clean.csv")
-    orders = orders.astype(object).where(pd.notna(orders), None)
-
     order_items = pd.read_csv("data/proceed/order_items_clean.csv")
-    order_items = order_items.astype(object).where(pd.notna(order_items), None)
-
     order_payments = pd.read_csv("data/proceed/order_payments_clean.csv")
-    order_payments = order_payments.astype(object).where(pd.notna(order_payments), None)
-
     order_reviews = pd.read_csv("data/proceed/order_reviews_clean.csv")
+
+    # Convertit les NaN en None
+    orders = orders.astype(object).where(pd.notna(orders), None)
+    order_items = order_items.astype(object).where(pd.notna(order_items), None)
+    order_payments = order_payments.astype(object).where(pd.notna(order_payments), None)
     order_reviews = order_reviews.astype(object).where(pd.notna(order_reviews), None)
 
-    items_grouped = order_items.groupby("order_id")
-    payments_grouped = order_payments.groupby("order_id")
-    reviews_grouped = order_reviews.groupby("order_id")
+    items_dict = {}
+    for order_id, group in order_items.groupby("order_id"):
+        items_dict[order_id] = [
+            {
+                "product_id": item["product_id"],
+                "seller_id": item["seller_id"],
+                "price": float(item["price"]),
+                "freight_value": float(item["freight_value"]),
+            }
+            for _, item in group.iterrows()
+        ]
 
-    start = time.time()
+    payments_dict = {}
+    for order_id, group in order_payments.groupby("order_id"):
+        payments_dict[order_id] = [
+            {
+                "type": payment["payment_type"],
+                "installments": int(payment["payment_installments"]),
+                "value": float(payment["payment_value"]),
+            }
+            for _, payment in group.iterrows()
+        ]
+
+    reviews_dict = {}
+    for order_id, group in order_reviews.groupby("order_id"):
+        reviews_dict[order_id] = [
+            {
+                "review_id": review["review_id"],
+                "score": review["review_score"],
+                "comment_title": review["review_comment_title"],
+                "comment_message": review["review_comment_message"],
+                "creation_date": review["review_creation_date"],
+                "answer_timestamp": review["review_answer_timestamp"],
+            }
+            for _, review in group.iterrows()
+        ]
+
+    orders_mongo = []
 
     for _, order in orders.iterrows():
         order_id = order["order_id"]
 
-        orders_obj = {
+        order_doc = {
             "_id": order_id,
             "customer_id": order["customer_id"],
             "status": order["order_status"],
             "purchase_timestamp": order["order_purchase_timestamp"],
-            "items": [],
-            "payments": [],
-            "reviews": [],
+            "items": items_dict.get(order_id, []),
+            "payments": payments_dict.get(order_id, []),
+            "reviews": reviews_dict.get(order_id, []),
             "delivery": {
                 "estimated_delivery": order["order_estimated_delivery_date"],
                 "delivered_at": order["order_delivered_customer_date"],
             },
         }
 
-        if order_id in items_grouped.groups:
-            for _, item in items_grouped.get_group(order_id).iterrows():
-                orders_obj["items"].append(
-                    {
-                        "product_id": item["product_id"],
-                        "seller_id": item["seller_id"],
-                        "price": float(item["price"]),
-                        "freight_value": float(item["freight_value"]),
-                    }
-                )
-
-        if order_id in payments_grouped.groups:
-            for _, payment in payments_grouped.get_group(order_id).iterrows():
-                orders_obj["payments"].append(
-                    {
-                        "type": payment["payment_type"],
-                        "installments": int(payment["payment_installments"]),
-                        "value": float(payment["payment_value"]),
-                    }
-                )
-
-        if order_id in reviews_grouped.groups:
-            for _, review in reviews_grouped.get_group(order_id).iterrows():
-                orders_obj["reviews"].append(
-                    {
-                        "review_id": review["review_id"],
-                        "score": int(review["review_score"]),
-                        "comment_title": review["review_comment_title"],
-                        "comment_message": review["review_comment_message"],
-                        "creation_date": review["review_creation_date"],
-                        "answer_timestamp": review["review_answer_timestamp"],
-                    }
-                )
-
-        orders_mongo.append(orders_obj)
-
-    print("reviews: ", round(time.time() - start, 2))
+        orders_mongo.append(order_doc)
 
     return orders_mongo
 
@@ -95,7 +87,7 @@ def customers_dict():
         customer_doc = {
             "_id": customer["customer_id"],
             "customer_unique_id": customer["customer_unique_id"],
-            "zip_code": int(customer["customer_zip_code_prefix"]),
+            "zip_code": customer["customer_zip_code_prefix"],
             "city": customer["customer_city"],
             "state": customer["customer_state"],
         }
@@ -137,10 +129,11 @@ def products_dict():
 
     return products_mongo
 
+
 def sellers_dict():
     """Cree sellers_dict."""
-    sellers = pd.read_csv("data/proceed/sellers_clean.csv")
-    
+    sellers = pd.read_csv("data/proceed/sellers_clean.csv", dtype=str)
+
     sellers_mongo = []
 
     for _, seller in sellers.iterrows():
@@ -148,10 +141,9 @@ def sellers_dict():
             "_id": seller["seller_id"],
             "zip_code": seller["seller_zip_code_prefix"],
             "city": seller["seller_city"],
-            "state": seller["seller_state"]
+            "state": seller["seller_state"],
         }
 
         sellers_mongo.append(seller_doc)
 
     return sellers_mongo
-    
