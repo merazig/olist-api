@@ -1,14 +1,3 @@
-.env
-.venv/
-__pycache__/
-*.pyc
-
-tree_Projet.md
-
-# Données Olist
-data/raw/
-data/processed/
-
-# Logs
-logs/
-*.log
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*
+README_old

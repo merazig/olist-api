@@ -1,10 +1,9 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
 from pymongo import MongoClient, UpdateOne
-
 
 # ============================================================
 # CONFIGURATION
@@ -58,8 +57,7 @@ def clean_zip_code(value) -> str:
     value = str(value).strip()
 
     # Évite les valeurs du type 1000.0
-    if value.endswith(".0"):
-        value = value[:-2]
+    value = value.removesuffix(".0")
 
     return value.zfill(5)
 

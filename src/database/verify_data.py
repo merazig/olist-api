@@ -5,7 +5,6 @@ import pandas as pd
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-
 # ============================================================
 # CONFIGURATION
 # ============================================================
@@ -69,8 +68,7 @@ def normalize_zip(value):
     value = str(value).strip()
 
     # Supprime éventuellement le suffixe .0 créé par certains CSV.
-    if value.endswith(".0"):
-        value = value[:-2]
+    value = value.removesuffix(".0")
 
     return value.zfill(5)
 
