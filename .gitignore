@@ -2,3 +2,5 @@ env
 .env
 *.ipynb
 data
+.ruff_cache
+__pycache__
