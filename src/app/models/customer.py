@@ -8,6 +8,6 @@ class Customer(BaseModel):
 
     id: str
     customer_unique_id: str
-    zip_code_prefix: str | None = None
+    zip_code: str | None = None
     city: str | None = None
     state: str | None = None

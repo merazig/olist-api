@@ -2,10 +2,7 @@
 
 from fastapi import FastAPI
 
-from src.app.routers import customers
-from src.app.routers import products
-from src.app.routers import orders
-from src.app.routers import sellers
+from src.app.routers import customers, orders, products, sellers, statistics
 
 app = FastAPI(
     title="Olist API",
@@ -17,6 +14,7 @@ app.include_router(customers.router)
 app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(sellers.router)
+app.include_router(statistics.router)
 
 
 @app.get("/")

@@ -39,3 +39,9 @@ def load_to_mongo(db, collection_name, data):
     result = collection.insert_many(data)
 
     print(f"{collection_name}: {len(result.inserted_ids)} documents insérés")
+
+
+def create_indexes(db):
+    """Cree des index."""
+    db.orders.create_index("customer_id")
+    db.orders.create_index("status")

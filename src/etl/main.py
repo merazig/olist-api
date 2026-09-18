@@ -13,7 +13,7 @@ from src.etl.clean_csv import (
 
 from src.etl.transform import orders_dict, customers_dict, products_dict, sellers_dict
 
-from src.etl.load_mongo import get_database, load_to_mongo
+from src.etl.load_mongo import get_database, load_to_mongo, create_indexes
 
 import time
 
@@ -43,8 +43,10 @@ def main():
     # load orders
     start = time.time()
     load_to_mongo(db, "orders", orders)
+
+    create_indexes(db)
     end = time.time()
-    print("temps de load des données orders: ", round((end - start), 2))
+    print("temps de load et la création des,indexes orders: ", round((end - start), 2))
 
     # transform and customers
     print("======Customers======")
