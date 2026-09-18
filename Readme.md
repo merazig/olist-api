@@ -297,10 +297,17 @@ Cette interface permet de :
 ```
 GET /customers
 ```
-
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/customers?limit=3"
+```
 Retourne les clients disponibles.
 ```
 GET /customers/{customer_id}
+```
+Exemple :
+
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/customers/34a4d38dfc89ce24d9e96604ac22d7f4"
 ```
 
 Retourne un client à partir de son identifiant.
@@ -320,29 +327,69 @@ avec une réponse du type :
 ```
 GET /orders
 ```
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/orders?limit=3"
+```
+Ou avec pagination:
+
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/orders?limit=10&skip=20"
+```
 
 Retourne les commandes disponibles.
 ```
 GET /orders/{order_id}
 ```
-
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/orders/e481f51cbdc54678b7cc49136f2d6af7"
+```
 Retourne une commande à partir de son identifiant.
+
+Cette commande est particulièrement intéressante car elle permet de vérifier que MongoDB contient bien les données embarquées :
+
+```text
+order
+ ├── customer_id
+ ├── dates
+ ├── items[]
+ ├── payments[]
+ └── reviews[]
+```
 
 # Products
 ```
 GET /products
 ```
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/products?limit=3"
+```
 
+Avec pagination :
+
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/products?limit=10&skip=20"
+```
 Retourne les produits disponibles.
 ```
 GET /products/{product_id}
 ```
-
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/products/1e9e8ef04dbcff4541ed26657ea517e5"
+```
 Retourne un produit à partir de son identifiant.
 
 ## Sellers
 ```
 GET /sellers
+```
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/sellers?limit=3"
+```
+
+avec pagination :
+
+```powershell
+Invoke-RestMethod "http://127.0.0.1:8000/sellers?limit=10&skip=20"
 ```
 
 Retourne les vendeurs disponibles.
